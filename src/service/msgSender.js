@@ -371,12 +371,18 @@ const handleMsg2Single = async function (body, { bot, messageReceiver }) {
   // msgReceiver 可以由外部提供
   if (!msgReceiver) {
     if (isRoom === true && typeof to === 'string') {
-      msgReceiver = await bot.Room.find({ topic: to })
+      msgReceiver = await bot.Room.find({ id: to })
+      if (!msgReceiver) {
+        msgReceiver = await bot.Room.find({ topic: to })  
+      }      
     } else {
-      msgReceiver = await bot.Contact.find(
-        //@ts-expect-error wechaty 貌似未定义 {alias:string} 的场景
-        Utils.equalTrueType(to, 'object') ? to : { name: to }
-      )
+      msgReceiver = await bot.Contact.find({ id: to })
+      if (!msgReceiver) {
+        msgReceiver = await bot.Contact.find(
+          //@ts-expect-error wechaty 貌似未定义 {alias:string} 的场景
+          Utils.equalTrueType(to, 'object') ? to : { name: to }
+        )
+      }
     }
   }
 
